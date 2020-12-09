@@ -57,6 +57,10 @@ HRESULT portableDeviceValues_GetUnsignedIntegerValue(IPortableDeviceValues *pPor
 	return pPortableDeviceValues->GetUnsignedIntegerValue(*key, value);
 }
 
+HRESULT portableDeviceValues_GetUnsignedLargeIntegerValue(IPortableDeviceValues* pPortableDeviceValues, const PROPERTYKEY* key, ULONGLONG* value) {
+	return pPortableDeviceValues->GetUnsignedLargeIntegerValue(*key, value);
+}
+
 HRESULT portableDeviceValues_SetGuidValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, GUID *pGuid) {
 	return pPortableDeviceValues->SetGuidValue(*key, *pGuid);
 }
@@ -215,6 +219,10 @@ HRESULT stream_Commit(IStream *pStream, DWORD dataFlag) {
 
 HRESULT stream_Stat(IStream *pStream, STATSTG *pStatstg, DWORD statFlags) {
 	return pStream->Stat(pStatstg, statFlags);
+}
+
+HRESULT stream_Release(IStream *pStream) {
+	return pStream->Release();
 }
 
 HRESULT sequentialStream_Read(ISequentialStream *pSequentialStream, LPVOID pBuffer, ULONG cb, ULONG *pcbRead) {

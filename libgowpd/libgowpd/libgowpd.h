@@ -123,6 +123,7 @@ extern "C" {
 	HRESULT portableDeviceValues_GetBoolValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, BOOL *value);
 	HRESULT portableDeviceValues_GetStringValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, PWSTR *value, DWORD *cValue);
 	HRESULT portableDeviceValues_GetUnsignedIntegerValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, ULONG *value);
+	HRESULT portableDeviceValues_GetUnsignedLargeIntegerValue(IPortableDeviceValues* pPortableDeviceValues, const PROPERTYKEY* key, ULONGLONG* value);
 	HRESULT portableDeviceValues_SetGuidValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, GUID *pGuid);
 	HRESULT portableDeviceValues_SetStringValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, LPCWSTR value);
 	HRESULT portableDeviceValues_SetUnsignedIntegerValue(IPortableDeviceValues *pPortableDeviceValues, const PROPERTYKEY *key, const ULONG value);
@@ -159,6 +160,7 @@ extern "C" {
 
 	HRESULT stream_Commit(IStream *pStream, DWORD dataFlag);
 	HRESULT stream_Stat(IStream *pStream, STATSTG *pStatstg, DWORD statFlags);
+	HRESULT stream_Release(IStream *pStream);
 
 	HRESULT sequentialStream_Read(ISequentialStream *pSequentialStream, LPVOID pBuffer, ULONG cb, ULONG *pcbRead);
 	HRESULT sequentialStream_Write(ISequentialStream *pSequentialStream, LPVOID pBuffer, ULONG cb, ULONG *pcbWritten);

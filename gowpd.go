@@ -37,6 +37,7 @@ package gowpd
 //-lPortableDeviceGuids -luuid
 
 #include "libgowpd.h"
+
 */
 import "C"
 import (
@@ -47,6 +48,11 @@ import (
 	"unicode/utf8"
 	"unsafe"
 )
+
+func PnpToByte(pnpid PnPDeviceID) []byte {
+	return C.GoBytes(unsafe.Pointer((*C.char)(unsafe.Pointer(pnpid))), C.int(C.wcslen(pnpid))*2)
+}
+
 
 const (
 	CLSCTX_INPROC_SERVER CLSCTX = 1 << iota
@@ -451,6 +457,16 @@ func (pPortableDevice *IPortableDevice) Release() error {
 	return nil
 }
 
+func (pPortableDevice *IPortableDevice) Close() error {
+	hr := C.portableDevice_Close((*C.IPortableDevice)(pPortableDevice))
+
+	if hr < 0 {
+		return HRESULT(hr)
+	}
+
+	return nil
+}
+
 func (pPortableDeviceValues *IPortableDeviceValues) GetBoolValue(key PropertyKey) (bool, error) {
 	var (
 		value C.BOOL // non-zero is TRUE, zero is FALSE. Windows Type.
@@ -530,7 +546,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) SetStringValue(key PropertyK
 
 	log.Println("SetStringValue(): memory allocated")
 
-	raw := (*[1 << 30]C.WCHAR)(unsafe.Pointer(pwstr))[:len(value)+1 : len(value)+1]
+	raw := (*[1 << 30]C.WCHAR)(unsafe.Pointer(pwstr))[: len(value)+1 : len(value)+1]
 	for i, char := range []byte(value) {
 		raw[i] = C.WCHAR(char)
 	}
@@ -569,6 +585,19 @@ func (pPortableDeviceValeus *IPortableDeviceValues) SetUnsignedLargeIntegerValue
 	return nil
 }
 
+func (pPortableDeviceValeus *IPortableDeviceValues) GetUnsignedLargeIntegerValue(key PropertyKey) (uint64, error) {
+	var (
+		value C.ULONGLONG
+	)
+	hr := C.portableDeviceValues_GetUnsignedLargeIntegerValue((*C.IPortableDeviceValues)(pPortableDeviceValeus), key.toCPropertyKey(), &value)
+
+	if hr < 0 {
+		return 0, HRESULT(hr)
+	}
+
+	return uint64(value), nil
+}
+
 func (pPortableDeviceValues *IPortableDeviceValues) QueryInterface(iid IID) (unsafe.Pointer, error) {
 	pUnknown := (*IUnknown)(unsafe.Pointer(pPortableDeviceValues))
 
@@ -601,6 +630,9 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDevices() ([]PnPDeviceI
 	}
 
 	log.Printf("GetDevices(): %d devices has been found.\n", cPnPDeviceIDs)
+	log.Println("*pPnPDeviceIDs: ", *pPnPDeviceIDs)
+	log.Println("&pPnPDeviceIDs: ", &pPnPDeviceIDs)
+	log.Println("pPnPDeviceIDs: ", pPnPDeviceIDs)
 
 	raw := (*[1 << 30]C.PnPDeviceID)(unsafe.Pointer(pPnPDeviceIDs))[:cPnPDeviceIDs:cPnPDeviceIDs]
 	ids := make([]PnPDeviceID, uint32(cPnPDeviceIDs))
@@ -996,6 +1028,16 @@ func (pStream *IStream) Commit(dataFlag uint32) error {
 	return nil
 }
 
+func (pStream *IStream) Release() error {
+	hr := C.stream_Release((*C.IStream)(pStream))
+
+	if hr < 0 {
+		return HRESULT(hr)
+	}
+
+	return nil
+}
+
 func (pStream *IStream) Stat(statFlags uint32) (*StatStg, error) {
 	var (
 		statstg C.STATSTG
@@ -1126,6 +1168,9 @@ func toGoString(str C.PWSTR, cStr uint32) string {
 
 		goString = append(goString, buffer[:bytes]...)
 	}
+	// 这边每个都多了个0在最末尾，不能在这边改，会导致原方法不能使用，如：GetStringValue等
+	//fmt.Println("====goString===:", goString)
+	//goString = goString[:len(goString) - 1]
 
 	return string(goString)
 }
@@ -1144,7 +1189,7 @@ func allocatePWSTRCoTask(value string) (C.PWSTR, error) {
 	if pwstr == nil {
 		return nil, E_POINTER
 	}
-	raw := (*[1 << 30]C.WCHAR)(pwstr)[:len(value)+1 : len(value)+1]
+	raw := (*[1 << 30]C.WCHAR)(pwstr)[: len(value)+1 : len(value)+1]
 
 	for i, r := range utf16Str {
 		raw[i] = C.WCHAR(r)
@@ -1171,7 +1216,7 @@ func allocatePWSTR(value string) (C.PWSTR, error) {
 	if pwstr == nil {
 		return nil, E_POINTER
 	}
-	raw := (*[1 << 30]C.WCHAR)(pwstr)[:len(value)+1 : len(value)+1]
+	raw := (*[1 << 30]C.WCHAR)(pwstr)[: len(value)+1 : len(value)+1]
 
 	for i, r := range utf16Str {
 		raw[i] = C.WCHAR(r)
