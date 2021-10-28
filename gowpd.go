@@ -52,6 +52,34 @@ func PnpToByte(pnpid PnPDeviceID) []byte {
 	return C.GoBytes(unsafe.Pointer((*C.char)(unsafe.Pointer(pnpid))), C.int(C.wcslen(pnpid))*2)
 }
 
+func PnpToStr(pnpid PnPDeviceID) string {
+	return Unicode2UTF8(PnpToByte(pnpid))
+}
+func Unicode2UTF8(buf []byte) string {
+	ulen := len(buf) / 2
+	if len(buf)%2 != 0 {
+		ulen++
+	}
+	unicodes := make([]uint16, ulen)
+	i := 0
+	for i = 0; i != len(buf)/2; i++ {
+		unicodes[i] = uint16(buf[2*i]) + uint16(buf[2*i+1])<<8
+	}
+	if len(buf)%2 != 0 {
+		unicodes[i] = uint16(buf[i*2])
+	}
+	return UTF16ToString(unicodes)
+}
+func UTF16ToString(s []uint16) string {
+	for i, v := range s {
+		if v == 0 {
+			s = s[0:i]
+			break
+		}
+	}
+	return string(utf16.Decode(s))
+}
+
 
 const (
 	CLSCTX_INPROC_SERVER CLSCTX = 1 << iota
