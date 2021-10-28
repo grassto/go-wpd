@@ -1,14 +1,13 @@
-package gowpd_test
+package gowpd
 
 import (
-	"github.com/rlj1202/go-wpd"
 	"log"
 )
 
 func Example_transferToDevice() {
-	gowpd.Initialize()
+	Initialize()
 
-	mng, err := gowpd.CreatePortableDeviceManager()
+	mng, err := CreatePortableDeviceManager()
 	if err != nil {
 		panic(err)
 	}
@@ -18,14 +17,14 @@ func Example_transferToDevice() {
 		panic(err)
 	}
 
-	pClientInfo, err := gowpd.CreatePortableDeviceValues()
+	pClientInfo, err := CreatePortableDeviceValues()
 	if err != nil {
 		panic(err)
 	}
-	pClientInfo.SetStringValue(gowpd.WPD_CLIENT_NAME, "libgowpd")
-	pClientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MAJOR_VERSION, 1)
-	pClientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MINOR_VERSION, 0)
-	pClientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_REVISION, 2)
+	pClientInfo.SetStringValue(WPD_CLIENT_NAME, "libgowpd")
+	pClientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MAJOR_VERSION, 1)
+	pClientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MINOR_VERSION, 0)
+	pClientInfo.SetUnsignedIntegerValue(WPD_CLIENT_REVISION, 2)
 
 	targetDeviceFriendlyName := "SANDISK "
 	// objectId where the file will be transferred under.
@@ -38,11 +37,11 @@ func Example_transferToDevice() {
 		}
 
 		if friendlyName != targetDeviceFriendlyName {
-			gowpd.FreeDeviceID(id)
+			FreeDeviceID(id)
 			continue
 		}
 
-		pPortableDevice, err := gowpd.CreatePortableDevice()
+		pPortableDevice, err := CreatePortableDevice()
 		if err != nil {
 			panic(err)
 		}
@@ -58,13 +57,13 @@ func Example_transferToDevice() {
 		filePath = "E:\\test.md"
 
 		// open file as IStream.
-		pFileStream, err := gowpd.SHCreateStreamOnFile(filePath, 0)
+		pFileStream, err := SHCreateStreamOnFile(filePath, 0)
 		if err != nil {
 			panic(err)
 		}
 
 		// acquire properties needed to transfer file to device
-		pObjectProperties, err := gowpd.GetRequiredPropertiesForContentType(gowpd.WPD_CONTENT_TYPE_IMAGE, targetObjectID, filePath, pFileStream)
+		pObjectProperties, err := GetRequiredPropertiesForContentType(WPD_CONTENT_TYPE_IMAGE, targetObjectID, filePath, pFileStream)
 		if err != nil {
 			panic(err)
 		}
@@ -80,14 +79,14 @@ func Example_transferToDevice() {
 		}
 
 		// convert pTempStream to PortableDeviceDataStream to use more method e.g newly created object id.
-		_pFinalObjectDataStream, err := pTempStream.QueryInterface(gowpd.IID_IPortableDeviceDataStream)
+		_pFinalObjectDataStream, err := pTempStream.QueryInterface(IID_IPortableDeviceDataStream)
 		if err != nil {
 			panic(err)
 		}
-		pFinalObjectDataStream := (*gowpd.IPortableDeviceDataStream)(_pFinalObjectDataStream)
+		pFinalObjectDataStream := (*IPortableDeviceDataStream)(_pFinalObjectDataStream)
 
 		// copy data from pFileStream to pFinalObjectDataStream
-		cbBytesWritten, err := gowpd.StreamCopy((*gowpd.IStream)(_pFinalObjectDataStream), pFileStream, cbTransferSize)
+		cbBytesWritten, err := StreamCopy((*IStream)(_pFinalObjectDataStream), pFileStream, cbTransferSize)
 		if err != nil {
 			panic(err)
 		}
@@ -104,14 +103,14 @@ func Example_transferToDevice() {
 		log.Printf("\"%s\" has been transferred to device successfully: %d\n", newlyCreatedObjectID, cbBytesWritten)
 
 		// transferring is finished. release the deviceID.
-		gowpd.FreeDeviceID(id)
+		FreeDeviceID(id)
 		// release device interface too.
 		pPortableDevice.Release()
 	}
 
 	for _, id := range deviceIDs {
-		gowpd.FreeDeviceID(id)
+		FreeDeviceID(id)
 	}
 
-	gowpd.Uninitialize()
+	Uninitialize()
 }

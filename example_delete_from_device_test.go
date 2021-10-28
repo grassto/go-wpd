@@ -1,14 +1,13 @@
-package gowpd_test
+package gowpd
 
 import (
-	"github.com/rlj1202/go-wpd"
 	"log"
 )
 
 func Example_deleteFromDevice() {
-	gowpd.Initialize()
+	Initialize()
 
-	mng, err := gowpd.CreatePortableDeviceManager()
+	mng, err := CreatePortableDeviceManager()
 	if err != nil {
 		panic(err)
 	}
@@ -18,20 +17,20 @@ func Example_deleteFromDevice() {
 		panic(err)
 	}
 
-	clientInfo, err := gowpd.CreatePortableDeviceValues()
+	clientInfo, err := CreatePortableDeviceValues()
 	if err != nil {
 		panic(err)
 	}
-	clientInfo.SetStringValue(gowpd.WPD_CLIENT_NAME, "libgowpd")
-	clientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MAJOR_VERSION, 1)
-	clientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MINOR_VERSION, 0)
-	clientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_REVISION, 2)
+	clientInfo.SetStringValue(WPD_CLIENT_NAME, "libgowpd")
+	clientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MAJOR_VERSION, 1)
+	clientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MINOR_VERSION, 0)
+	clientInfo.SetUnsignedIntegerValue(WPD_CLIENT_REVISION, 2)
 
 	// objectID which will be deleted from the device.
 	targetObjectID := "F:\\test.txt"
 
 	for _, id := range devices {
-		portableDevice, err := gowpd.CreatePortableDevice()
+		portableDevice, err := CreatePortableDevice()
 		if err != nil {
 			panic(err)
 		}
@@ -46,16 +45,16 @@ func Example_deleteFromDevice() {
 			panic(err)
 		}
 
-		pObjectsToDelete, err := gowpd.CreatePortableDevicePropVariantCollection()
+		pObjectsToDelete, err := CreatePortableDevicePropVariantCollection()
 
-		pv := new(gowpd.PropVariant)
+		pv := new(PropVariant)
 		pv.Init()
 		pv.Set(targetObjectID)
 		err = pObjectsToDelete.Add(pv)
 		if err != nil {
 			panic(err)
 		}
-		results, err := content.Delete(gowpd.PORTABLE_DEVICE_DELETE_NO_RECURSION, pObjectsToDelete)
+		results, err := content.Delete(PORTABLE_DEVICE_DELETE_NO_RECURSION, pObjectsToDelete)
 		if err != nil {
 			count, err := results.GetCount()
 			if err != nil {
@@ -67,7 +66,7 @@ func Example_deleteFromDevice() {
 				panic(err)
 			}
 			log.Printf("Type: %d\n", result.GetType())
-			if result.GetType() == gowpd.VT_ERROR {
+			if result.GetType() == VT_ERROR {
 				log.Printf("error: %#x\n", result.GetError())
 			}
 
@@ -75,11 +74,11 @@ func Example_deleteFromDevice() {
 		}
 
 		pv.Clear()
-		gowpd.FreeDeviceID(id)
+		FreeDeviceID(id)
 	}
 
 	mng.Release()
-	gowpd.Uninitialize()
+	Uninitialize()
 
 	// Output:
 }

@@ -1,11 +1,10 @@
-package gowpd_test
+package gowpd
 
 import (
-	"github.com/rlj1202/go-wpd"
 	"log"
 )
 
-func RecursiveEnumerate(parentObjectID string, content *gowpd.IPortableDeviceContent) {
+func RecursiveEnumerate(parentObjectID string, content *IPortableDeviceContent) {
 	enum, err := content.EnumObjects(parentObjectID)
 	if err != nil {
 		panic(err)
@@ -33,21 +32,21 @@ func RecursiveEnumerate(parentObjectID string, content *gowpd.IPortableDeviceCon
 }
 
 func Example_contentEnumerate() {
-	gowpd.Initialize()
+	Initialize()
 
-	mng, err := gowpd.CreatePortableDeviceManager()
+	mng, err := CreatePortableDeviceManager()
 	if err != nil {
 		panic(err)
 	}
 
-	pClientInfo, err := gowpd.CreatePortableDeviceValues()
+	pClientInfo, err := CreatePortableDeviceValues()
 	if err != nil {
 		panic(err)
 	}
-	pClientInfo.SetStringValue(gowpd.WPD_CLIENT_NAME, "libgowpd")
-	pClientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MAJOR_VERSION, 1)
-	pClientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MINOR_VERSION, 0)
-	pClientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_REVISION, 2)
+	pClientInfo.SetStringValue(WPD_CLIENT_NAME, "libgowpd")
+	pClientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MAJOR_VERSION, 1)
+	pClientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MINOR_VERSION, 0)
+	pClientInfo.SetUnsignedIntegerValue(WPD_CLIENT_REVISION, 2)
 
 	deviceIDs, err := mng.GetDevices()
 	if err != nil {
@@ -55,7 +54,7 @@ func Example_contentEnumerate() {
 	}
 
 	for _, deviceID := range deviceIDs {
-		device, err := gowpd.CreatePortableDevice()
+		device, err := CreatePortableDevice()
 		if err != nil {
 			panic(err)
 		}
@@ -70,10 +69,10 @@ func Example_contentEnumerate() {
 			panic(err)
 		}
 
-		RecursiveEnumerate(gowpd.WPD_DEVICE_OBJECT_ID, content)
+		RecursiveEnumerate(WPD_DEVICE_OBJECT_ID, content)
 
-		gowpd.FreeDeviceID(deviceID)
+		FreeDeviceID(deviceID)
 	}
 
-	gowpd.Uninitialize()
+	Uninitialize()
 }

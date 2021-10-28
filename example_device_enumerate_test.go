@@ -1,14 +1,13 @@
-package gowpd_test
+package gowpd
 
 import (
-	"github.com/rlj1202/go-wpd"
 	"log"
 )
 
 func Example_deviceEnumerate() {
-	gowpd.Initialize()
+	Initialize()
 
-	mng, err := gowpd.CreatePortableDeviceManager()
+	mng, err := CreatePortableDeviceManager()
 	if err != nil {
 		panic(err)
 	}
@@ -37,8 +36,8 @@ func Example_deviceEnumerate() {
 		log.Printf("\tManufacturer: %s\n", manufacturer)
 		log.Printf("\tDescription:  %s\n", description)
 
-		gowpd.FreeDeviceID(deviceID)
+		FreeDeviceID(deviceID)
 	}
 
-	gowpd.Uninitialize()
+	Uninitialize()
 }

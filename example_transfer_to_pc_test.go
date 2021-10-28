@@ -1,14 +1,13 @@
-package gowpd_test
+package gowpd
 
 import (
-	"github.com/rlj1202/go-wpd"
 	"log"
 )
 
 func Example_transferToPC() {
-	gowpd.Initialize()
+	Initialize()
 
-	mng, err := gowpd.CreatePortableDeviceManager()
+	mng, err := CreatePortableDeviceManager()
 	if err != nil {
 		panic(err)
 	}
@@ -18,14 +17,14 @@ func Example_transferToPC() {
 		panic(err)
 	}
 
-	clientInfo, err := gowpd.CreatePortableDeviceValues()
+	clientInfo, err := CreatePortableDeviceValues()
 	if err != nil {
 		panic(err)
 	}
-	clientInfo.SetStringValue(gowpd.WPD_CLIENT_NAME, "libgowpd")
-	clientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MAJOR_VERSION, 1)
-	clientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_MINOR_VERSION, 0)
-	clientInfo.SetUnsignedIntegerValue(gowpd.WPD_CLIENT_REVISION, 2)
+	clientInfo.SetStringValue(WPD_CLIENT_NAME, "libgowpd")
+	clientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MAJOR_VERSION, 1)
+	clientInfo.SetUnsignedIntegerValue(WPD_CLIENT_MINOR_VERSION, 0)
+	clientInfo.SetUnsignedIntegerValue(WPD_CLIENT_REVISION, 2)
 
 	// object ID which will be transferred to PC.
 	targetObjectID := "F:\\test.txt"
@@ -33,7 +32,7 @@ func Example_transferToPC() {
 	targetDestination := "E:\\test.txt"
 
 	for _, id := range deviceIDs {
-		portableDevice, err := gowpd.CreatePortableDevice()
+		portableDevice, err := CreatePortableDevice()
 		if err != nil {
 			panic(err)
 		}
@@ -49,17 +48,17 @@ func Example_transferToPC() {
 			panic(err)
 		}
 
-		objectDataStream, optimalTransferSize, err := resources.GetStream(targetObjectID, gowpd.WPD_RESOURCE_DEFAULT, gowpd.STGM_READ)
+		objectDataStream, optimalTransferSize, err := resources.GetStream(targetObjectID, WPD_RESOURCE_DEFAULT, STGM_READ)
 		if err != nil {
 			panic(err)
 		}
 
-		pFinalFileStream, err := gowpd.SHCreateStreamOnFile(targetDestination, gowpd.STGM_CREATE|gowpd.STGM_WRITE)
+		pFinalFileStream, err := SHCreateStreamOnFile(targetDestination, STGM_CREATE|STGM_WRITE)
 		if err != nil {
 			panic(err)
 		}
 
-		totalBytesWritten, err := gowpd.StreamCopy(pFinalFileStream, objectDataStream, optimalTransferSize)
+		totalBytesWritten, err := StreamCopy(pFinalFileStream, objectDataStream, optimalTransferSize)
 		if err != nil {
 			panic(err)
 		}
@@ -71,12 +70,12 @@ func Example_transferToPC() {
 
 		log.Printf("Total bytes written: %d\n", totalBytesWritten)
 
-		gowpd.FreeDeviceID(id)
+		FreeDeviceID(id)
 		portableDevice.Release()
 	}
 
 	mng.Release()
-	gowpd.Uninitialize()
+	Uninitialize()
 
 	// Output:
 }

@@ -18,19 +18,17 @@ func GetRequiredPropertiesForAllContentTypes(pObjectProperties *IPortableDeviceV
 	if pFileStream == nil {
 		return E_POINTER
 	}
-	info, err := os.Stat(filePath)
-	if err != nil {
-		return err
-	}
-
-	// 这边的Stat方法不准确，可以改Stat方法
 	//statstg, err := pFileStream.Stat(STATFLAG_NONAME)
 	//if err != nil {
 	//	return err
 	//}
-	//
-	//err = pObjectProperties.SetUnsignedLargeIntegerValue(WPD_OBJECT_SIZE, statstg.cbSize)
-	err = pObjectProperties.SetUnsignedLargeIntegerValue(WPD_OBJECT_SIZE, uint64(info.Size()))
+
+	stat, err := os.Stat(filePath)
+	if err != nil {
+		return err
+	}
+
+	err = pObjectProperties.SetUnsignedLargeIntegerValue(WPD_OBJECT_SIZE, uint64(stat.Size()))
 	if err != nil {
 		return err
 	}

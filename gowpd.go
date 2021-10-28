@@ -43,7 +43,6 @@ import "C"
 import (
 	"encoding/binary"
 	"fmt"
-	"log"
 	"unicode/utf16"
 	"unicode/utf8"
 	"unsafe"
@@ -345,7 +344,7 @@ func (hr HRESULT) Error() string {
 }
 
 func Initialize() error {
-	log.Println("Initialize():")
+	//log.Println("Initialize():")
 
 	hr := C.CoInitializeEx(nil, C.COINIT_MULTITHREADED)
 	if hr < 0 {
@@ -356,7 +355,7 @@ func Initialize() error {
 }
 
 func Uninitialize() {
-	log.Println("Uninitialize():")
+	//log.Println("Uninitialize():")
 
 	C.CoUninitialize()
 }
@@ -380,7 +379,7 @@ func CoCreateInstance(clsid CLSID, iid IID) (unsafe.Pointer, error) {
 }
 
 func CreatePortableDevice() (*IPortableDevice, error) {
-	log.Println("CreatePortableDevice(): Ready")
+	//log.Println("CreatePortableDevice(): Ready")
 
 	ptr, err := CoCreateInstance(CLSID_PortableDeviceFTM, IID_IPortableDevice)
 
@@ -388,7 +387,7 @@ func CreatePortableDevice() (*IPortableDevice, error) {
 }
 
 func CreatePortableDeviceValues() (*IPortableDeviceValues, error) {
-	log.Println("CreatePortableDeviceValues(): Ready")
+	//log.Println("CreatePortableDeviceValues(): Ready")
 
 	ptr, err := CoCreateInstance(CLSID_PortableDeviceValues, IID_IPortableDeviceValues)
 
@@ -396,7 +395,7 @@ func CreatePortableDeviceValues() (*IPortableDeviceValues, error) {
 }
 
 func CreatePortableDeviceManager() (*IPortableDeviceManager, error) {
-	log.Println("CreatePortableDeviceManager(): Create portable device manager instance.")
+	//log.Println("CreatePortableDeviceManager(): Create portable device manager instance.")
 
 	ptr, err := CoCreateInstance(CLSID_PortableDeviceManager, IID_IPortableDeviceManager)
 
@@ -404,7 +403,7 @@ func CreatePortableDeviceManager() (*IPortableDeviceManager, error) {
 }
 
 func CreatePortableDeviceKeyCollection() (*IPortableDeviceKeyCollection, error) {
-	log.Println("CreatePortableDeviceKeyCollection(): Ready")
+	//log.Println("CreatePortableDeviceKeyCollection(): Ready")
 
 	ptr, err := CoCreateInstance(CLSID_PortableDeviceKeyCollection, IID_IPortableDeviceKeyCollection)
 
@@ -412,7 +411,7 @@ func CreatePortableDeviceKeyCollection() (*IPortableDeviceKeyCollection, error) 
 }
 
 func CreatePortableDevicePropVariantCollection() (*IPortableDevicePropVariantCollection, error) {
-	log.Println("CreatePortableDevicePropVariantCollection(): Ready")
+	//log.Println("CreatePortableDevicePropVariantCollection(): Ready")
 
 	ptr, err := CoCreateInstance(CLSID_PortableDevicePropVariantCollection, IID_IPortableDevicePropVariantCollection)
 
@@ -424,7 +423,7 @@ func (pPortableDevice *IPortableDevice) Content() (*IPortableDeviceContent, erro
 		pPortableDeviceContent *C.IPortableDeviceContent
 	)
 
-	log.Println("Content(): Ready")
+	//log.Println("Content(): Ready")
 
 	hr := C.portableDevice_Content((*C.IPortableDevice)(pPortableDevice), &pPortableDeviceContent)
 
@@ -436,7 +435,7 @@ func (pPortableDevice *IPortableDevice) Content() (*IPortableDeviceContent, erro
 }
 
 func (pPortableDevice *IPortableDevice) Open(pnpDeviceID PnPDeviceID, pClientInfo *IPortableDeviceValues) error {
-	log.Println("Open(): Ready")
+	//log.Println("Open(): Ready")
 
 	hr := C.portableDevice_Open((*C.IPortableDevice)(pPortableDevice), pnpDeviceID, (*C.IPortableDeviceValues)(pClientInfo))
 
@@ -487,7 +486,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) GetStringValue(key PropertyK
 		cPwstr C.DWORD
 	)
 
-	log.Println("GetStringValue(): Ready")
+	//log.Println("GetStringValue(): Ready")
 
 	hr := C.portableDeviceValues_GetStringValue((*C.IPortableDeviceValues)(pPortableDeviceValues), key.toCPropertyKey(), &pwstr, &cPwstr)
 	defer C.CoTaskMemFree(C.LPVOID(pwstr))
@@ -498,7 +497,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) GetStringValue(key PropertyK
 
 	str := toGoString(pwstr, uint32(cPwstr))
 
-	log.Printf("GetStringValue(): Result: %s\n", str)
+	//log.Printf("GetStringValue(): Result: %s\n", str)
 
 	return str, nil
 }
@@ -508,7 +507,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) GetUnsignedIntegerValue(key 
 		value C.ULONG
 	)
 
-	log.Println("GetUnsignedIntegerValue(): Ready")
+	//log.Println("GetUnsignedIntegerValue(): Ready")
 
 	hr := C.portableDeviceValues_GetUnsignedIntegerValue((*C.IPortableDeviceValues)(pPortableDeviceValues), key.toCPropertyKey(), &value)
 
@@ -516,7 +515,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) GetUnsignedIntegerValue(key 
 		return 0, HRESULT(hr)
 	}
 
-	log.Printf("GetUnsignedIntegerValue(): Result: %d\n", value)
+	//log.Printf("GetUnsignedIntegerValue(): Result: %d\n", value)
 
 	return uint32(value), nil
 }
@@ -536,7 +535,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) SetStringValue(key PropertyK
 		pwstr C.PWSTR
 	)
 
-	log.Println("SetStringValue(): Ready")
+	//log.Println("SetStringValue(): Ready")
 
 	pwstr = C.PWSTR(C.malloc(C.size_t(C.sizeof_WCHAR * (len(value) + 1))))
 	if pwstr == nil {
@@ -544,7 +543,7 @@ func (pPortableDeviceValues *IPortableDeviceValues) SetStringValue(key PropertyK
 	}
 	defer C.free(unsafe.Pointer(pwstr))
 
-	log.Println("SetStringValue(): memory allocated")
+	//log.Println("SetStringValue(): memory allocated")
 
 	raw := (*[1 << 30]C.WCHAR)(unsafe.Pointer(pwstr))[: len(value)+1 : len(value)+1]
 	for i, char := range []byte(value) {
@@ -558,13 +557,13 @@ func (pPortableDeviceValues *IPortableDeviceValues) SetStringValue(key PropertyK
 		return HRESULT(hr)
 	}
 
-	log.Printf("SetStringValue(): {hresult: %#x}\n", hr)
+	//log.Printf("SetStringValue(): {hresult: %#x}\n", hr)
 
 	return nil
 }
 
 func (pPortableDeviceValues *IPortableDeviceValues) SetUnsignedIntegerValue(key PropertyKey, value uint32) error {
-	log.Println("SetUnsignedIntegerValue(): Ready")
+	//log.Println("SetUnsignedIntegerValue(): Ready")
 
 	hr := C.portableDeviceValues_SetUnsignedIntegerValue((*C.IPortableDeviceValues)(pPortableDeviceValues), key.toCPropertyKey(), C.ULONG(value))
 
@@ -620,7 +619,7 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDevices() ([]PnPDeviceI
 		cPnPDeviceIDs C.DWORD        = 0
 	)
 
-	log.Println("GetDevices(): Ready")
+	//log.Println("GetDevices(): Ready")
 
 	hr := C.portableDeviceManager_GetDevices((*C.IPortableDeviceManager)(pPortableDeviceManager), &pPnPDeviceIDs, &cPnPDeviceIDs)
 	defer C.free(unsafe.Pointer(pPnPDeviceIDs))
@@ -629,10 +628,10 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDevices() ([]PnPDeviceI
 		return nil, HRESULT(hr)
 	}
 
-	log.Printf("GetDevices(): %d devices has been found.\n", cPnPDeviceIDs)
-	log.Println("*pPnPDeviceIDs: ", *pPnPDeviceIDs)
-	log.Println("&pPnPDeviceIDs: ", &pPnPDeviceIDs)
-	log.Println("pPnPDeviceIDs: ", pPnPDeviceIDs)
+	//log.Printf("GetDevices(): %d devices has been found.\n", cPnPDeviceIDs)
+	//log.Println("*pPnPDeviceIDs: ", *pPnPDeviceIDs)
+	//log.Println("&pPnPDeviceIDs: ", &pPnPDeviceIDs)
+	//log.Println("pPnPDeviceIDs: ", pPnPDeviceIDs)
 
 	raw := (*[1 << 30]C.PnPDeviceID)(unsafe.Pointer(pPnPDeviceIDs))[:cPnPDeviceIDs:cPnPDeviceIDs]
 	ids := make([]PnPDeviceID, uint32(cPnPDeviceIDs))
@@ -649,7 +648,7 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDeviceFriendlyName(pnpD
 		cFriendlyName C.DWORD = 0
 	)
 
-	log.Println("GetDeviceFriendlyName(): Ready")
+	//log.Println("GetDeviceFriendlyName(): Ready")
 
 	hr := C.portableDeviceManager_GetDeviceFriendlyName((*C.struct_IPortableDeviceManager)(pPortableDeviceManager), pnpDeviceID, &pFriendlyName, &cFriendlyName)
 	defer C.free(unsafe.Pointer(pFriendlyName))
@@ -660,7 +659,7 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDeviceFriendlyName(pnpD
 
 	str := toGoString(pFriendlyName, uint32(cFriendlyName))
 
-	log.Printf("GetDeviceFriendlyName(): %s\n", str)
+	//log.Printf("GetDeviceFriendlyName(): %s\n", str)
 
 	return str, nil
 }
@@ -680,7 +679,7 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDeviceManufacturer(pnpD
 
 	str := toGoString(pManufacturer, uint32(cManufacturer))
 
-	log.Printf("GetDeviceManufacturer(): %s\n", str)
+	//log.Printf("GetDeviceManufacturer(): %s\n", str)
 
 	return str, nil
 }
@@ -700,7 +699,7 @@ func (pPortableDeviceManager *IPortableDeviceManager) GetDeviceDescription(pnpDe
 
 	str := toGoString(pDescription, uint32(cDescription))
 
-	log.Printf("GetDeviceDescription(): %s\n", str)
+	//log.Printf("GetDeviceDescription(): %s\n", str)
 
 	return str, nil
 }
@@ -723,7 +722,7 @@ func (pPortableDeviceContent *IPortableDeviceContent) CreateObjectWithProperties
 		return nil, 0, HRESULT(hr)
 	}
 
-	log.Printf("CreateObjectWithPropertiesAndData(): {optimalWriteBufferSize: %d}\n", optimalWriteBufferSize)
+	//log.Printf("CreateObjectWithPropertiesAndData(): {optimalWriteBufferSize: %d}\n", optimalWriteBufferSize)
 
 	return (*IStream)(pData), uint32(optimalWriteBufferSize), nil
 }
@@ -741,7 +740,7 @@ func (pPortableDeviceContent *IPortableDeviceContent) EnumObjects(parentObjectID
 	pwstrParentObjectID, _ = allocatePWSTR(parentObjectID)
 	defer C.free(unsafe.Pointer(pwstrParentObjectID))
 
-	log.Println("EnumObjects(): Ready")
+	//log.Println("EnumObjects(): Ready")
 
 	hr := C.portableDeviceContent_EnumObjects((*C.IPortableDeviceContent)(pPortableDeviceContent), flags, pwstrParentObjectID, pFilter, &pEnum)
 
@@ -757,7 +756,7 @@ func (pPortableDeviceContent *IPortableDeviceContent) Properties() (*IPortableDe
 		pPortableDeviceProperties *C.IPortableDeviceProperties
 	)
 
-	log.Println("Properties(): Ready")
+	//log.Println("Properties(): Ready")
 
 	hr := C.portableDeviceContent_Properties((*C.IPortableDeviceContent)(pPortableDeviceContent), &pPortableDeviceProperties)
 
@@ -796,13 +795,13 @@ func (pPortableDeviceContent *IPortableDeviceContent) Delete(options uint32, obj
 		return (*IPortableDevicePropVariantCollection)(results), HRESULT(hr)
 	}
 
-	log.Printf("Delete(): Result %#x\n", uint32(hr))
+	//log.Printf("Delete(): Result %#x\n", uint32(hr))
 
 	return (*IPortableDevicePropVariantCollection)(results), nil
 }
 
 func (pPortableDeviceKeyCollection *IPortableDeviceKeyCollection) Add(key PropertyKey) error {
-	log.Println("Add(): Ready")
+	//log.Println("Add(): Ready")
 
 	hr := C.portableDeviceKeyCollection_Add((*C.IPortableDeviceKeyCollection)(pPortableDeviceKeyCollection), key.toCPropertyKey())
 
@@ -925,11 +924,11 @@ func (pEnumObjectIDs *IEnumPortableDeviceObjectIDs) Next(cObjects uint32) ([]str
 	defer C.free(unsafe.Pointer(pObjIDs))
 	defer C.free(unsafe.Pointer(cObjIDs))
 
-	log.Println("Next(): Ready")
+	//log.Println("Next(): Ready")
 
 	hr := C.enumPortableDeviceObjectIDs_Next((*C.IEnumPortableDeviceObjectIDs)(pEnumObjectIDs), C.ULONG(cObjects), pObjIDs, cObjIDs, &cPetched)
 
-	log.Printf("Next(): {result: %s, cPetched: %d}\n", HRESULT(hr), cPetched)
+	//log.Printf("Next(): {result: %s, cPetched: %d}\n", HRESULT(hr), cPetched)
 
 	if hr < 0 {
 		return nil, HRESULT(hr)
@@ -943,7 +942,7 @@ func (pEnumObjectIDs *IEnumPortableDeviceObjectIDs) Next(cObjects uint32) ([]str
 		str := toGoString(pwstr, wcslen(pwstr))
 		objects[i] = str
 
-		log.Printf("Next(): {object: %s}\n", str)
+		//log.Printf("Next(): {object: %s}\n", str)
 
 		C.CoTaskMemFree(C.LPVOID(pwstr))
 	}
